@@ -1,16 +1,1 @@
-{
-    "Name": "HierarchicalPriors",
-    "BIDSVersion": "1.9.0",
-    "DatasetType": "raw",
-    "Authors": [
-        "Jonathan Buchholz",
-        "Guido Hesselmann"
-    ],
-    "GeneratedBy": [
-        {
-            "Name": "MNE-BIDS",
-            "Version": "0.18.0",
-            "CodeURL": "https://mne.tools/mne-bids/"
-        }
-    ]
-}
+.git/annex/objects/6Q/QG/SHA256E-s479--e3f7fd90591fc9486c34171116983272bf097ffc4d17d03350ef60d706df08dd.json/SHA256E-s479--e3f7fd90591fc9486c34171116983272bf097ffc4d17d03350ef60d706df08dd.json
