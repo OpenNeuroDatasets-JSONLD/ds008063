@@ -4,7 +4,7 @@ This file provides a experimental guide linking the analysis of *Buchholz & Hess
 
 This EEG-BIDS dataset contains cue-locked EEG recordings and event annotations from a random-dot kinematogram (RDK) task designed to dissociate low-level and high-level priors during perceptual decision-making. The accompanying analysis tests whether hierarchical priors bias behavior through signal detection theory (SDT) and generalized drift-diffusion modeling (gDDM), and whether they modulate occipital oscillatory or aperiodic EEG activity.
 
-The trial-level variables needed for analysis are stored in `epochs.metadata` and are illustrated by the accompanying `metadata.csv` file. Each row corresponds to one cue-locked epoch/trial retained in the MNE `Epochs` object. Additionally, [trigger codes](#trigger-codes) stored as annotations enable (less flexible) trial-wise analyses.
+The trial-level variables needed for analysis are stored in `epochs.metadata` and are illustrated by the accompanying `metadata.csv` file. Each row corresponds to one cue-locked epoch/trial retained in the MNE `Epochs` object. Participant-level questionnaire and trait variables are stored in `trait_variables.csv`, with one row per participant. Additionally, [trigger codes](#trigger-codes) stored as annotations enable (less flexible) trial-wise analyses.
 
 ## Data collection
 
@@ -16,7 +16,7 @@ The experiment used a within-subject design with three conditions: baseline/no p
 
 Before the experiment, individual motion sensitivity was estimated with two 40-trial QUEST staircases targeting 75% discrimination accuracy. The final threshold defined medium coherence; low and high coherence were 50% and 200% of this threshold, respectively. Learning blocks overrepresented medium- and high-coherence trials to support prior acquisition, whereas baseline and test blocks overrepresented low-coherence trials and contained no high-coherence trials to increase reliance on prior information.
 
-Continuous EEG was recorded from 31 active Ag/AgCl electrodes arranged according to the international 10/20 system using an actiChamp Plus amplifier at 1000 Hz. The ground electrode was placed at FPz and data were online referenced to FCz. Electrode impedances were kept below 20 kOhm, and participants were instructed to minimize blinks, saccades, muscle activity, and body movement during recording. Post-experimental questionnaires assessed demographics, manipulation checks, belief strength, and psychosis proneness.
+Continuous EEG was recorded from 31 active Ag/AgCl electrodes arranged according to the international 10/20 system using an actiChamp Plus amplifier at 1000 Hz. The ground electrode was placed at FPz and data were online referenced to FCz. Electrode impedances were kept below 20 kOhm, and participants were instructed to minimize blinks, saccades, muscle activity, and body movement during recording. Post-experimental questionnaires assessed demographics, manipulation checks, belief strength, psychosis proneness, and psychological flexibility/inflexibility traits. These participant-level variables are documented in `[trait_variables.csv](#traits_cleancsv-questionnaire-and-trait-column-dictionary)`.
 
 ## Task summary
 
@@ -108,6 +108,76 @@ The table below explains the columns in `metadata.csv`, which are attached to ea
 | `response_prior`      | `0`, `1`, missing                    | Response recoded relative to the prior-defined decision bound. In prior conditions, `1` = response in the prior-congruent direction and `0` = response in the prior-incongruent direction. In baseline trials, `1` = left response and `0` = right response. | Primary binary response variable for SDT and gDDM boundary coding.                                                |
 
 
+## `trait_variables.csv` questionnaire and trait column dictionary
+
+`trait_variables.csv` contains participant-level questionnaire, demographic, belief-strength, and trait data. The supplied file has 43 rows and 347 columns. Each row corresponds to one participant. Merge it with trial-level metadata by matching `trait_variables.csv:participant` to `metadata.csv` / `epochs.metadata:participant`.
+
+### Column naming conventions and coding
+
+
+| Column(s) / pattern             | Columns in supplied file | Values / coding                                                            | Meaning and recommended use                                                                                                                                                                                                                                                                                            |
+| ------------------------------- | ------------------------ | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `participant`                   | 1                        | `sub-001`, `sub-003`, ...                                                  | Participant identifier. Use as the merge key for questionnaire data; corresponds to `participant` in `epochs.metadata`.                                                                                                                                                                                                |
+| `gender`                        | 1                        | `female`, `male`, `trans`                                                  | Self-reported gender category as stored in the questionnaire export.                                                                                                                                                                                                                                                   |
+| `education`                     | 1                        | `fhr_abi`, `uni`                                                           | Self-reported education category as stored in the questionnaire export.                                                                                                                                                                                                                                                |
+| `highprior_strength`            | 1                        | VAS 0-100; observed range in this file: 0-75                               | Strength of the participant's belief in the allegedly motion-altering glasses. Higher values indicate stronger belief. This is the high-level-prior manipulation-check / belief-strength variable.                                                                                                                     |
+| `pdi_<item>0`                   | 40                       | `0` = no, `1` = yes                                                        | Peters et al. Delusions Inventory (PDI) endorsement item. `<item>` runs from `01` to `40`; for example, `pdi_010` is item 01 endorsement. Use these columns to compute the PDI endorsement sum score.                                                                                                                  |
+| `pdi_<item>1`                   | 40                       | 1-5 if the item was endorsed; missing otherwise                            | PDI distress rating for the corresponding endorsed belief/experience; for example, `pdi_011` is distress for item 01.                                                                                                                                                                                                  |
+| `pdi_<item>2`                   | 40                       | 1-5 if the item was endorsed; missing otherwise                            | PDI preoccupation rating: how often the participant thinks about the corresponding belief/experience; for example, `pdi_012` is preoccupation for item 01.                                                                                                                                                             |
+| `pdi_<item>3`                   | 40                       | 1-5 if the item was endorsed; missing otherwise                            | PDI conviction rating: how true the participant believes the corresponding thought is; for example, `pdi_013` is conviction for item 01.                                                                                                                                                                               |
+| `caps_<item>0`                  | 32                       | `0` = no, `1` = yes                                                        | Cardiff Anomalous Perceptions Scale (CAPS) endorsement item. `<item>` runs from `01` to `32`; for example, `caps_010` is item 01 endorsement. Use these columns to compute the CAPS endorsement sum score.                                                                                                             |
+| `caps_<item>1`                  | 32                       | 1-5 if the item was endorsed; missing otherwise                            | CAPS distress rating for the corresponding endorsed anomalous perceptual experience; for example, `caps_011` is distress for item 01.                                                                                                                                                                                  |
+| `caps_<item>2`                  | 32                       | 1-5 if the item was endorsed; missing otherwise                            | CAPS intrusiveness rating for the corresponding endorsed anomalous perceptual experience; for example, `caps_012` is intrusiveness for item 01.                                                                                                                                                                        |
+| `caps_<item>3`                  | 32                       | 1-5 if the item was endorsed; missing otherwise                            | CAPS frequency rating for the corresponding endorsed anomalous perceptual experience; for example, `caps_013` is frequency for item 01.                                                                                                                                                                                |
+| `<mpfi_subscale>_<pair>_<item>` | 55                       | 1-6; `1` = never true / `Traf nie zu`, `6` = always true / `Traf immer zu` | Multidimensional Psychological Flexibility Inventory (MPFI) items. The first part gives the subscale, the middle integer links flexible and inflexible counterparts, and the final two digits give the item number within that subscale. One participant in the supplied file has missing values for all MPFI columns. |
+
+
+### MPFI subscale coding
+
+The MPFI columns use matched flexible/inflexible process pairs. Matching values of the middle integer identify corresponding Hexaflex components.
+
+
+| Pair index | Flexible MPFI subscale                                                          | Inflexible MPFI subscale                               | Construct pair                                                                                   |
+| ---------- | ------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `1`        | `accept_1_`* — acceptance *(not present in the supplied `trait_variables.csv`)* | `avoidance_1_`* — experiential avoidance               | Opening up to difficult private experiences vs. trying to avoid or suppress them.                |
+| `2`        | `aware_2_*` — present-moment awareness                                          | `moment_2_*` — lack of contact with the present moment | Being attentive to ongoing thoughts and feelings vs. being disconnected from the present moment. |
+| `3`        | `context_3_*` — self-as-context                                                 | `content_3_*` — self-as-content                        | Taking a broader perspective on self/experience vs. being caught in self-evaluative content.     |
+| `4`        | `defusion_4_*` — defusion                                                       | `fusion_4_*` — cognitive fusion                        | Noticing thoughts and feelings without being dominated by them vs. getting stuck in them.        |
+| `5`        | `values_5_*` — values                                                           | `lackvalues_5_*` — lack of contact with values         | Staying connected to what matters vs. losing contact with personally meaningful directions.      |
+| `6`        | `action_6_*` — committed action                                                 | `inaction_6_*` — inaction                              | Persisting in valued action vs. not acting in line with what matters.                            |
+
+
+### Psychosis-proneness score from `trait_variables.csv`
+
+Psychosis proneness was assessed as a composite score derived from the PDI and CAPS endorsement sum scores, weighted by their relative number of items, following Eckert et al. (2023). This composite measure was then z-transformed before further processing. In practice, compute participant-level PDI and CAPS endorsement sums from the `*0` columns, weight them by scale length so that the 40-item PDI and 32-item CAPS contribute comparably, and then z-transform the resulting composite across participants.
+
+```python
+import numpy as np
+from scipy.stats import zscore
+
+pdi_endorsement_cols = [c for c in traits.columns if c.startswith("pdi_") and c.endswith("0")]
+caps_endorsement_cols = [c for c in traits.columns if c.startswith("caps_") and c.endswith("0")]
+
+# z-transformation & weighted sums 
+for col in score_cols:
+    mean = traits[col].mean()
+    std = traits[col].std()
+    traits[f'z_{col}'] = (traits[col] - mean) / std  # z-transform
+    # weigthed pdi & caps (according to relative contribution to total item number)
+    match col:
+        case 'pdi_0_sum':
+            traits[f'weight_{col}'] = (traits[col] * (40/72))
+        case 'caps_0_sum':
+            traits[f'weight_{col}'] = (traits[col] * (32/72))    
+
+traits['psych_prone'] = traits['pdi_0_sum'] + traits['caps_0_sum']
+traits['z_psych_prone'] = traits['z_pdi_0_sum'] + traits['z_caps_0_sum']
+traits['weighted_psych_prone'] = traits['weight_pdi_0_sum'] + traits['weight_caps_0_sum']
+
+```
+
+Use `psychosis_proneness_z` for the manuscript-level correlations with participant-level prior effects. Use `highprior_strength` separately when testing whether subjective belief in the glasses relates to high-level prior effects.
+
 ## Reproducing the manuscript analyses from metadata
 
 ### 1. Recommended trial filters
@@ -126,29 +196,29 @@ When using preprocessed MNE `Epochs`, the rows in `epochs.metadata` remain align
 ### 2. Manuscript variables and metadata columns
 
 
-| Manuscript variable / analysis concept | Metadata column(s)                                                | Coding / transformation                                                                                |
-| -------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Participant                            | `participant`                                                     | Group all first-level estimates by participant.                                                        |
-| Prior condition                        | `exp`                                                             | `base` = baseline/no prior; `lowlevel` = low-level prior; `highlevel` = high-level prior.              |
-| Baseline/no-prior trials               | `exp == 'base'`, `prior == 'noprior'`, `cueHz == 750`             | Neutral tone, no directional prediction.                                                               |
-| Low-level prior trials                 | `exp == 'lowlevel'`, `cueHz in [600, 900]`                        | Tone direction mapping is encoded in `cueAss`; final predicted direction is already stored in `prior`. |
-| High-level prior trials                | `exp == 'highlevel'`, `cueHz == 750`, `prior in ['left','right']` | Directional prediction comes from the alleged motion-enhancing glasses, not from the tone.             |
-| Motion direction                       | `motion_direction`                                                | Physical RDK direction: left or right.                                                                 |
-| Prior direction                        | `prior`                                                           | Direction predicted by tone or glasses; `noprior` for baseline.                                        |
-| Response direction                     | `response`                                                        | Participant's left/right report.                                                                       |
-| Accuracy                               | `corr`                                                            | `1` if `response == motion_direction`, else `0`.                                                       |
-| RT                                     | `rt`                                                              | Seconds from RDK onset to response.                                                                    |
-| RT/response exclusion                  | `rt_flag`, `response`, `rt`                                       | Exclude `rt_flag == True` and missing values.                                                          |
-| Sensory precision / motion coherence   | `coh`, `coh_level`, `thresh75`                                    | Use continuous `coh` for gDDM drift modulation; use `coh_level` for descriptive checks.                |
-| Prior-congruent stimulus               | `motion_direction`, `prior`, `exp`                                | Prior conditions: `motion_direction == prior`; baseline: `motion_direction == 'left'` for SDT coding.  |
-| Prior-congruent response               | `response_prior`                                                  | Prior conditions: `1` = response matches `prior`; baseline: `1` = left response.                       |
-| SDT signal-present trial               | `motion_direction`, `prior`, `exp`                                | Prior conditions: prior-congruent motion; baseline: leftward motion.                                   |
-| SDT signal response                    | `response_prior`                                                  | `response_prior == 1`.                                                                                 |
-| DDM response/boundary                  | `response_prior`                                                  | Prior conditions: prior-congruent vs. prior-incongruent response; baseline: left vs. right response.   |
-| EEG condition contrast                 | `exp`                                                             | Compare `lowlevel` vs `base` and `highlevel` vs `base`.                                                |
-| Spectral parameterization condition    | `exp`                                                             | Estimate PSD/specparam measures separately for `base`, `lowlevel`, and `highlevel`.                    |
-| Psychosis proneness                    | external questionnaire data                                       | Not in metadata. Merge PDI/CAPS composite scores by `participant`.                                     |
-| High-level belief strength             | external questionnaire data                                       | Not in metadata. Merge VAS belief ratings by `participant`.                                            |
+| Manuscript variable / analysis concept | Metadata column(s)                                                | Coding / transformation                                                                                                                                                        |
+| -------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Participant                            | `participant`                                                     | Group all first-level estimates by participant.                                                                                                                                |
+| Prior condition                        | `exp`                                                             | `base` = baseline/no prior; `lowlevel` = low-level prior; `highlevel` = high-level prior.                                                                                      |
+| Baseline/no-prior trials               | `exp == 'base'`, `prior == 'noprior'`, `cueHz == 750`             | Neutral tone, no directional prediction.                                                                                                                                       |
+| Low-level prior trials                 | `exp == 'lowlevel'`, `cueHz in [600, 900]`                        | Tone direction mapping is encoded in `cueAss`; final predicted direction is already stored in `prior`.                                                                         |
+| High-level prior trials                | `exp == 'highlevel'`, `cueHz == 750`, `prior in ['left','right']` | Directional prediction comes from the alleged motion-enhancing glasses, not from the tone.                                                                                     |
+| Motion direction                       | `motion_direction`                                                | Physical RDK direction: left or right.                                                                                                                                         |
+| Prior direction                        | `prior`                                                           | Direction predicted by tone or glasses; `noprior` for baseline.                                                                                                                |
+| Response direction                     | `response`                                                        | Participant's left/right report.                                                                                                                                               |
+| Accuracy                               | `corr`                                                            | `1` if `response == motion_direction`, else `0`.                                                                                                                               |
+| RT                                     | `rt`                                                              | Seconds from RDK onset to response.                                                                                                                                            |
+| RT/response exclusion                  | `rt_flag`, `response`, `rt`                                       | Exclude `rt_flag == True` and missing values.                                                                                                                                  |
+| Sensory precision / motion coherence   | `coh`, `coh_level`, `thresh75`                                    | Use continuous `coh` for gDDM drift modulation; use `coh_level` for descriptive checks.                                                                                        |
+| Prior-congruent stimulus               | `motion_direction`, `prior`, `exp`                                | Prior conditions: `motion_direction == prior`; baseline: `motion_direction == 'left'` for SDT coding.                                                                          |
+| Prior-congruent response               | `response_prior`                                                  | Prior conditions: `1` = response matches `prior`; baseline: `1` = left response.                                                                                               |
+| SDT signal-present trial               | `motion_direction`, `prior`, `exp`                                | Prior conditions: prior-congruent motion; baseline: leftward motion.                                                                                                           |
+| SDT signal response                    | `response_prior`                                                  | `response_prior == 1`.                                                                                                                                                         |
+| DDM response/boundary                  | `response_prior`                                                  | Prior conditions: prior-congruent vs. prior-incongruent response; baseline: left vs. right response.                                                                           |
+| EEG condition contrast                 | `exp`                                                             | Compare `lowlevel` vs `base` and `highlevel` vs `base`.                                                                                                                        |
+| Spectral parameterization condition    | `exp`                                                             | Estimate PSD/specparam measures separately for `base`, `lowlevel`, and `highlevel`.                                                                                            |
+| Psychosis proneness                    | `trait_variables.csv`: PDI/CAPS columns                           | Not in `epochs.metadata`. Compute the PDI/CAPS composite score from `pdi_*0` and `caps_*0` endorsement columns, weight by scale length, z-transform, and merge by participant. |
+| High-level belief strength             | `trait_variables.csv`: `highprior_strength`                       | Not in `epochs.metadata`. VAS rating from 0-100 indexing belief in the allegedly motion-altering glasses; merge by participant.                                                |
 
 
 ### 3. Signal detection theory coding
@@ -215,15 +285,17 @@ Spectral parameterization outputs are not stored in `epochs.metadata`. They shou
 
 ### 6. Psychosis-proneness correlations
 
-Psychosis-proneness measures are not stored in `epochs.metadata`. To reproduce the associative analyses:
+Psychosis-proneness measures are not stored in `epochs.metadata`; they are derived from `trait_variables.csv`. To reproduce the associative analyses:
 
 1. compute participant-level behavioral prior metrics, preferably drift rates from the gDDM, separately for `lowlevel` and `highlevel`;
-2. merge these metrics with questionnaire-derived psychosis proneness scores by `participant`;
-3. compute product-moment correlations between psychosis proneness and low-level/high-level drift-rate metrics.
+2. compute PDI and CAPS endorsement sum scores from `trait_variables.csv` using the `pdi_*0` and `caps_*0` columns;
+3. derive the psychosis-proneness composite by weighting the PDI and CAPS sum scores by their relative number of items and z-transforming the composite across participants;
+4. merge the resulting `psychosis_proneness_z` score with participant-level behavioral metrics by matching `trait_variables.csv:participant` to `epochs.metadata:participant`;
+5. compute product-moment correlations between psychosis proneness and low-level/high-level drift-rate metrics.
 
 ## Variables not contained in `epochs.metadata`
 
-The metadata table does not contain PDI scores, CAPS scores, the PDI/CAPS psychosis-proneness composite, VAS belief strength ratings, raw ICA labels, bad-channel interpolation logs, rejected-epoch annotations, SDT estimates, gDDM estimates, TFR outputs, or spectral-parameterization outputs. These variables must be obtained from questionnaire files, preprocessing logs, or analysis derivatives.
+The metadata table does not contain PDI scores, CAPS scores, the PDI/CAPS psychosis-proneness composite, VAS belief strength ratings, MPFI item responses, raw ICA labels, bad-channel interpolation logs, rejected-epoch annotations, SDT estimates, gDDM estimates, TFR outputs, or spectral-parameterization outputs. PDI, CAPS, MPFI, demographic, and VAS belief-strength variables are stored in `trait_variables.csv`; preprocessing variables must be obtained from preprocessing logs; SDT, gDDM, TFR, and spectral-parameterization variables must be obtained from analysis derivatives.
 
 ============================================================================================
 
